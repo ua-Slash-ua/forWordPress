@@ -1,8 +1,14 @@
-#
-.idea
-s.json
-inc
+# PyCharm/VSCode settings
+.idea/
+.vscode/
+settings.json
+
+# Системні файли
+__pycache__/
+*.log
+
+# Проєктні файли
 debug.log
 test.py
-settings.json
-__pycache__
+s.json
+inc/
