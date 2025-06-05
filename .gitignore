@@ -1,0 +1,16 @@
+# PyCharm/VSCode settings
+.idea/
+.vscode/
+
+# Системні файли
+__pycache__/
+*.log
+
+# Проєктні файли
+environment_wordpress-6.8.1
+test.py
+
+# Налаштування
+deploy_config.json
+custom_themes_config.json
+record_config.json
