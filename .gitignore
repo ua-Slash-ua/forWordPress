@@ -5,3 +5,4 @@ inc
 debug.log
 test.py
 settings.json
+__pycache__
