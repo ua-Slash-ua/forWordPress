@@ -1,0 +1,113 @@
+{
+    "main": {
+        "word": "banner",
+        "type": "option",
+        "main_path": "D:\\Slash\\Programming\\Language\\PhP\\atomy\\www\\wp-content\\themes\\atomy",
+        "main_file": ""
+    },
+    "path": {
+        "inc": "D:\\Slash\\Programming\\Language\\PhP\\atomy\\www\\wp-content\\themes\\atomy\\admin_panel",
+        "js": "D:\\Slash\\Programming\\Language\\PhP\\atomy\\www\\wp-content\\themes\\atomy\\admin_panel\\ap_scripts",
+        "css": "D:\\Slash\\Programming\\Language\\PhP\\atomy\\www\\wp-content\\themes\\atomy\\admin_panel\\ap_styles"
+    },
+    "types": {
+        "post": {
+            "input": [],
+            "img_link": [],
+            "img_svg": [],
+            "checkbox": [],
+            "hl_mixed": {
+                "input": [
+                    "banner_link"
+                ],
+                "img_link": [
+                    "banner_img"
+                ],
+                "img_svg": [],
+                "checkbox": []
+            },
+            "points": [],
+            "table": []
+        },
+        "option": {
+            "input": [],
+            "img_link": [],
+            "img_svg": [],
+            "checkbox": [],
+            "hl_mixed": {
+                "input": [
+                    "banner_link"
+                ],
+                "img_link": [
+                    "banner_img_desk",
+                    "banner_img_mob"
+                ],
+                "img_svg": [],
+                "checkbox": []
+            },
+            "points": [],
+            "table": []
+        },
+        "request": {
+            "email": true,
+            "load_phpmailer": true
+        }
+    },
+    "global": {
+        "debug_on": true,
+        "include_in_func": true,
+        "enqueue_media_uploader_wp": true,
+        "create_folder": true,
+        "auto_name_label": true,
+        "create_with_label": true
+    },
+    "dev_mod": {
+        "rewrite": true
+    },
+    "secret_data": {
+        "smtp": {
+            "smtp_email": "s.slashua@gmail.com",
+            "smtp_password": "wdzq tcir uizn dgaq"
+        }
+    }
+}        }
+    }
+}il.com",
+            "smtp_password": "wdzq tcir uizn dgaq"
+        }
+    }
+}
+    }
+}     }
+    }
+}    "points": [
+                "points_1",
+                "points_2"
+            ],
+            "table": [
+                "table_1"
+            ]
+        },
+        "request": {
+            "email": true,
+            "load_phpmailer": true
+        }
+    },
+    "global": {
+        "debug_on": true,
+        "include_in_func": true,
+        "enqueue_media_uploader_wp": true,
+        "create_folder": false,
+        "auto_name_label": true,
+        "create_with_label": true
+    },
+    "dev_mod": {
+        "rewrite": true
+    },
+    "secret_data": {
+        "smtp": {
+            "smtp_email": "s.slashua@gmail.com",
+            "smtp_password": "wdzq tcir uizn dgaq"
+        }
+    }
+}

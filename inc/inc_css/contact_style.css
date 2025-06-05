@@ -1,0 +1,159 @@
+/* This file for styles */
+/*----------------   < Input styles >   ----------------*/
+    label {
+    display: block; /* Розташовує текст на окремій лінії */
+    font-size: 16px; /* Розмір шрифту */
+    font-weight: bold; /* Напівжирний текст */
+    color: #333; /* Колір тексту */
+    margin-bottom: 8px; /* Відступ знизу */
+    cursor: pointer; /* Робить курсор у вигляді руки при наведенні */
+}
+
+input[type="text"] {
+    width: 100%; /* Ширина заповнює контейнер */
+    padding: 10px; /* Внутрішній відступ */
+    font-size: 16px; /* Розмір шрифту */
+    border: 1px solid #ccc; /* Сіра рамка */
+    border-radius: 4px; /* Закруглені кути */
+    background-color: #f9f9f9; /* Світло-сірий фон */
+    color: #333; /* Колір тексту */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Тінь всередині */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Анімація */
+}
+
+input[type="text"]:focus {
+    border-color: #007BFF; /* Синій колір рамки при фокусі */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Тінь при фокусі */
+    outline: none; /* Видаляє стандартне виділення */
+}\n
+.container_preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    width: 300px;
+    background-color: #f9f9f9;
+}
+
+.container_preview input[type="button"] {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.container_preview input[type="button"]:hover {
+    background-color: #0056b3;
+}
+
+.container_preview img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.container_preview input[type="text"] {
+    display: none; /* Прихований текстовий інпут */
+}
+\n
+.checkbox-label {
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+/* Стилі для чекбокса */
+.checkbox-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: white;
+    vertical-align: middle;
+}
+
+/* Стиль для активного (відміченого) чекбокса */
+.checkbox-input:checked {
+    background-color: #4CAF50;  /* Зелений колір для відміченого чекбокса */
+    border-color: #4CAF50;  /* Зелена обводка */
+}
+\n
+.container_preview_svg {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Стилі для текстового поля для SVG коду */
+#text_svg_area {
+    width: 100%;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical; /* дає можливість змінювати висоту textarea */
+    background-color: #fff;
+    color: #333;
+}
+
+/* Стилі для відображення попереднього перегляду SVG */
+.preview_svg {
+    width: 100%;
+    min-height: 200px;  /* мінімальна висота попереднього перегляду */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 20px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Вигляд при появі помилки (невірний SVG код) */
+.preview_svg.error {
+    background-color: #ffdddd;
+    border-color: #ff0000;
+    color: #ff0000;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Вигляд для заголовка/інструкцій */
+.container_preview_svg h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Підказки для textarea */
+#text_svg_area::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
