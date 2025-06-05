@@ -1,0 +1,22 @@
+{
+  "word": "spirit",
+  "meta_type": "options",
+  "path": {
+          "path_to_main": "D:\\Slash\\Programming\\Language\\PhP\\bilobrov",
+          "path_to_inc": "inc",
+          "path_to_css": "inc_css",
+          "path_to_js": "inc_js"
+          },
+  "is_create_file": true,
+  "include_in_function": false,
+  "enqueue_media_uploader": true,
+  "create_base_func": {
+                      "input_text": false,
+                      "img_link": false,
+                      "img_svg": false,
+                      "check_box": false
+                      },
+
+  "overwrite": true
+
+}
