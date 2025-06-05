@@ -1,0 +1,70 @@
+{
+  "main": {
+    "word": "example",
+    "type": "post",
+    "main_path": "path_ro_your_theme",
+    "main_file": ""
+
+  },
+  "path":{
+    "inc": "name_inc_folder",
+    "js": "name_inc_js_folder",
+    "css": "name_inc_css_folder"
+
+  },
+  "types": {
+    "post": {
+      "input": ["question", "answer"],
+      "img_link": ["photo_link"],
+      "img_svg": ["svg_code"],
+      "checkbox": ["is_main"],
+      "hl_mixed": {
+          "input": ["name"],
+          "img_link": ["avatar"],
+          "img_svg": ["svg_code"],
+          "checkbox": ["is_true"]
+      },
+      "points": ["UI","UX"],
+      "table": ["name","second_name"]
+
+    },
+    "option":{
+      "input": [],
+      "img_link": [],
+      "img_svg": [],
+      "checkbox": [],
+      "hl_mixed": {
+          "input": [],
+          "img_link": [],
+          "img_svg": [],
+          "checkbox": []
+      },
+      "points": [],
+      "table": []
+
+    },
+    "request": {
+      "email": true,
+      "load_phpmailer": true
+
+    }
+  },
+  "global": {
+    "debug_on": true,
+    "include_in_func": true,
+    "enqueue_media_uploader_wp": true,
+    "create_folder": true,
+    "auto_name_label": true,
+    "create_with_label": true
+    },
+  "dev_mod": {
+    "rewrite": true
+
+  },
+  "secret_data": {
+    "smtp": {
+      "smtp_email": "",
+      "smtp_password": ""
+    }
+  }
+}
