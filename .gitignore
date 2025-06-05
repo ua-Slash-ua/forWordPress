@@ -1,0 +1,19 @@
+# PyCharm/VSCode settings
+.idea/
+.vscode/
+
+# Системні файли
+__pycache__/
+*.log
+
+# Проєктні файли
+debug.log
+info.md
+plan.md
+test.py
+
+# Налаштування
+admin_panel_config.json
+base_config.json
+main_config.json
+wp_config.json
