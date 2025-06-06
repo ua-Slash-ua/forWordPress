@@ -1,6 +1,7 @@
 import os
 
 from core.custom_file_editors.FunctionEditor import FunctionEditor
+from core.custom_file_editors.WpConfigEditor import WpConfigEditor
 from core.custom_functions.BaseAdminPanel import BaseAdminPanel
 from core.custom_functions.CustomBaseFunctions import CustomBaseFunctions
 from core.custom_themes.WpBaseStructure import WpBaseStructure
@@ -87,6 +88,10 @@ class CustomThemes:
             }
             bap = BaseAdminPanel(path_to_theme, data)
             bap.create()
+            path_to_wp_config = os.path.join(path_to_theme[:path_to_theme.find('wp-content')],'wp-config.php')
+            ce = WpConfigEditor(path_to_wp_config)
+            ce.edit_wp_debug()
+
             self.error_log(f'Тему < {self.themes_name.capitalize()} > створено')
         except Exception as e:
             self.error_log(e)
