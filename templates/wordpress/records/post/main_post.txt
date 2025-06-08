@@ -94,10 +94,11 @@ function save_L_RNAME_meta($post_id)
     foreach ($fields_L_RNAME as $field) {
         $key = $field['key'];
         $sanitize = $field['sanitize_for_save'];
-
-        // Викликаємо sanitize-функцію для кожного поля
-        $value = call_user_func($sanitize, $_POST[$key]);
-
+        if (!$sanitize){
+            $value = $_POST[$key];
+        }else{
+            $value = call_user_func($sanitize, $_POST[$key]);
+        }
         // Оновлюємо мета-дані
         update_post_meta($post_id, $key, $value);
     }
@@ -130,6 +131,7 @@ function enqueue_L_RNAME_style_and_script($hook)
                 '1.0.0', // Версія скрипту
                 true // Вказуємо, що скрипт потрібно підключити в кінці сторінки
             );
+            enqueue_media_uploader();
         }
     }
 }

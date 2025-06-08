@@ -1,0 +1,1327 @@
+/***/  DATA_HARD_LABEL
+<div id="container-hl-LLABEL" class="container-hl">
+            <h1>Contact</h1>
+            <div class="container-hl-add">
+                <input type="text" name="hl_data_LLABEL" id="hl_data_LLABEL"
+                       value="<?php echo esc_attr($hl_LLABEL); ?>"
+                       hidden="hidden">
+                DATA_HL_LABEL
+                <input type="button" id="hl_btn_add_LLABEL" value="Add">
+            </div>
+            <div class="container-hl-preview">
+
+            </div>
+        </div>
+/***/  DATA_INPUT_HARD_LABEL
+                <label for="hl_INPUT_TYPE_LLABEL">CLABEL</label>
+                <input type="INPUT_STYPE" id="hl_INPUT_TYPE_LLABEL" class="input_text-item">
+/***/  DATA_TEXTAREA_HARD_LABEL
+                <label for="hl_textarea_LLABEL">CLABEL</label>
+                <textarea id="hl_textarea_LLABEL" cols="30" rows="10"></textarea>
+/***/  DATA_IMG_LINK_HARD_LABEL
+                <div class="hl_img_link" id="hl_img_link_LLABEL">
+                    <input type="button" value="Upload CLABEL" id="hl_img_link_upload_LLABEL">
+                    <div class="hl_img_link_preview_container" id="hl_img_link_preview_container_LLABEL">
+
+                    </div>
+                </div>
+/***/  DATA_IMG_SVG_HARD_LABEL
+                <div class="hl_img_svg" id="hl_img_svg_LLABEL">
+                    <label for="hl_img_svg_input_LLABEL">CLABEL</label>
+                    <textarea id="hl_img_svg_input_LLABEL" cols="30" rows="10"></textarea>
+                    <div class="hl_img_svg_preview"></div>
+                </div>
+/***/  DATA_VIDEO_HARD_LABEL
+                <div class="hl_video" id="hl_video_LLABEL">
+                    <input type="button" value="Upload CLABEL" id="hl_video_upload_LLABEL">
+                    <div class="hl_video_preview_container" id="hl_video_preview_container_LLABEL">
+
+                    </div>
+                </div>
+/***/  GET_HARD_LABEL
+$hl_LLABEL = get_post_meta($post->ID, 'hl_data_LLABEL', true);
+/***/  PROCESS_HARD_LABEL
+create_meta_field_config('hl_data_LLABEL', 'CLABEL', '', 'normalize_to_array'),
+/***/  CONCLASS_HARD_LABEL
+form-container-hl
+/***/  HARD_LABEL_FUNCTIONS
+function processHardLabel(hlNames) {
+    function trimArray(arr) {
+        if (arr.length <= 2) {
+            return [];
+        }
+        return arr.slice(1, -1);
+    }
+
+    function sliceAfterUnderscore(text, sliceIndex, delimiter = "_") {
+        const parts = text.split(delimiter);
+        if (parts.length <= sliceIndex) {
+            return "";
+        }
+        return parts.slice(sliceIndex).join(delimiter);
+    }
+
+    function createInputBtn(btnClass, btnValue, btnFunc) {
+        const btn = document.createElement('input')
+        btn.type = 'button'
+        btn.value = btnValue
+        btn.classList.add(btnClass)
+        btn.addEventListener('click', function () {
+            btnFunc(this)
+        })
+        return btn;
+    }
+
+    function actionBtnRemove(element) {
+        let hlName = sliceAfterUnderscore(element.parentElement.parentElement.parentElement.parentElement.id, 2, '-')
+        const mainDiv = document.querySelector(`#container-hl-${hlName}`)
+
+        element.parentElement.parentElement.remove()
+        updateHLForRestApi(mainDiv, hlName)
+
+    }
+
+    function actionEdit(element) {
+        let hlName = sliceAfterUnderscore(element.parentElement.parentElement.parentElement.parentElement.id, 2, '-')
+        const mainDiv = document.querySelector(`#container-hl-${hlName}`)
+        const contentElement = [...element.parentElement.parentElement.querySelector('div').children]
+        contentElement.forEach(elContainer =>{
+            let id = elContainer.querySelector('span').getAttribute('data-type')
+            const el = document.getElementById(id)
+            if (elContainer.classList.contains('hl_content_text')){
+                let value = elContainer.querySelector('p').textContent
+                if (id.startsWith('hl_input_checkbox_')){
+                    el.checked = value === 'on';
+                }else {
+                    el.value = value
+                }
+            }else if (elContainer.classList.contains('hl_content_img_svg')){
+                const svgPrev = elContainer.querySelector('.hl_img_link_preview_container')
+                el.querySelector('textarea').value = svgPrev.innerHTML
+                el.querySelector('div').innerHTML = svgPrev.innerHTML
+            }else if (elContainer.classList.contains('hl_content_img_link') || elContainer.classList.contains('hl_content_video')){
+                el.querySelector('div').innerHTML = elContainer.querySelector('div').innerHTML
+            }
+        })
+        actionBtnRemove(element)
+
+    }
+    function openMediaUploader(buttonElement, multiple = false, callback) {
+        buttonElement.addEventListener('click', function () {
+            const frame = wp.media({
+                title: 'Оберіть зображення',
+                button: {
+                    text: 'Вибрати'
+                },
+                multiple: multiple
+            });
+
+            frame.on('select', function () {
+                const selection = frame.state().get('selection');
+                const images = [];
+
+                selection.forEach(function (attachment) {
+                    const item = attachment.toJSON();
+                    images.push({
+                        id: item.id,
+                        url: item.url,
+                        alt: item.alt,
+                        title: item.title
+                    });
+                });
+
+                callback(images);
+            });
+
+            frame.open();
+        });
+    }
+
+
+    function renderImagesInContainer(containerDiv, images) {
+        if (!containerDiv) {
+            console.error('❌ containerDiv не знайдено!');
+            return;
+        }
+
+        containerDiv.innerHTML = '';
+
+        const imageArray = Array.isArray(images) ? images : [images];
+
+        const wrapperDiv = document.createElement('div');
+        wrapperDiv.classList.add('image-wrapper');
+
+        imageArray.forEach(url => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'image';
+            img.classList.add('image-item');
+            wrapperDiv.appendChild(img);
+        });
+
+        containerDiv.appendChild(wrapperDiv);
+    }
+
+    function openVideoUploader(buttonElement, multiple = false, callback) {
+        buttonElement.addEventListener('click', function () {
+            const frame = wp.media({
+                title: 'Оберіть відео',
+                button: {
+                    text: 'Вибрати'
+                },
+                multiple: multiple,
+                library: {
+                    type: 'video'
+                }
+            });
+
+            frame.on('select', function () {
+                const selection = frame.state().get('selection');
+                const videos = [];
+
+                selection.forEach(function (attachment) {
+                    const item = attachment.toJSON();
+                    videos.push({
+                        id: item.id,
+                        url: item.url,
+                        title: item.title
+                    });
+                });
+
+                callback(videos);
+            });
+
+            frame.open();
+        });
+    }
+    function renderVideosInContainer(containerDiv, videos) {
+        if (!containerDiv) {
+            console.error('❌ containerDiv не знайдено!');
+            return;
+        }
+
+        containerDiv.innerHTML = '';
+
+        const videoArray = Array.isArray(videos) ? videos : [videos];
+
+        const wrapperDiv = document.createElement('div');
+        wrapperDiv.classList.add('video-wrapper');
+
+        videoArray.forEach(videoUrl => {
+            const videoEl = document.createElement('video');
+            videoEl.src = videoUrl;
+            videoEl.controls = true;
+            videoEl.classList.add('video-item');
+            videoEl.style.maxWidth = '100%';
+            wrapperDiv.appendChild(videoEl);
+        });
+
+        containerDiv.appendChild(wrapperDiv);
+    }
+
+
+    function renderSVGInElement(svgData, containerElement) {
+        if (!containerElement) return;
+        containerElement.innerHTML = svgData;
+    }
+    function bindTextareaToSVGPreview(textareaElement, previewContainer) {
+        if (!textareaElement || !previewContainer) return;
+
+        textareaElement.addEventListener('input', function () {
+            const svgCode = textareaElement.value;
+            renderSVGInElement(svgCode,previewContainer)
+        });
+    }
+
+    function enableDragAndDrop(container,mainDiv, hlName) {
+        if (!container || !container.classList.contains('container-hl-preview')) {
+            console.error('Invalid container element');
+            return;
+        }
+
+        let draggedElement = null;
+        let placeholder = null;
+
+        // Створюємо placeholder елемент
+        function createPlaceholder() {
+            const div = document.createElement('div');
+            div.className = 'drag-placeholder';
+            div.style.cssText = `
+            height: 2px;
+            background-color: #007cba;
+            margin: 5px 0;
+            border-radius: 1px;
+            opacity: 0.8;
+        `;
+            return div;
+        }
+
+        // Додаємо draggable атрибут до всіх елементів
+        function makeDraggable() {
+            const items = container.querySelectorAll('.container-hl-preview-item');
+            items.forEach(item => {
+                item.draggable = true;
+                item.style.cursor = 'move';
+            });
+        }
+
+        // Обробник початку перетягування
+        function handleDragStart(e) {
+            draggedElement = e.target.closest('.container-hl-preview-item');
+            if (!draggedElement) return;
+
+            draggedElement.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', draggedElement.outerHTML);
+        }
+
+        // Обробник перетягування над елементом
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            const afterElement = getDragAfterElement(container, e.clientY);
+            const items = container.querySelectorAll('.container-hl-preview-item');
+
+            // Видаляємо попередній placeholder
+            if (placeholder && placeholder.parentNode) {
+                placeholder.parentNode.removeChild(placeholder);
+            }
+
+            placeholder = createPlaceholder();
+
+            if (afterElement == null) {
+                container.appendChild(placeholder);
+            } else {
+                container.insertBefore(placeholder, afterElement);
+            }
+        }
+
+        // Визначаємо елемент, після якого треба вставити
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.container-hl-preview-item:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Обробник відпускання елемента
+        function handleDrop(e) {
+            e.preventDefault();
+
+            if (!draggedElement || !placeholder) return;
+
+            // Вставляємо елемент на місце placeholder
+            if (placeholder.parentNode) {
+                placeholder.parentNode.insertBefore(draggedElement, placeholder);
+                placeholder.parentNode.removeChild(placeholder);
+            }
+
+            draggedElement.style.opacity = '1';
+            draggedElement = null;
+            placeholder = null;
+        }
+
+        // Обробник завершення перетягування
+        function handleDragEnd(e) {
+            const item = e.target.closest('.container-hl-preview-item');
+            if (item) {
+                item.style.opacity = '1';
+            }
+
+            // Видаляємо placeholder якщо він залишився
+            if (placeholder && placeholder.parentNode) {
+                placeholder.parentNode.removeChild(placeholder);
+                placeholder = null;
+            }
+
+            draggedElement = null;
+            updateHLForRestApi(mainDiv, hlName)
+        }
+
+        // Обробник входу в зону перетягування
+        function handleDragEnter(e) {
+            e.preventDefault();
+        }
+
+        // Обробник виходу з зони перетягування
+        function handleDragLeave(e) {
+            // Перевіряємо чи курсор справді покинув контейнер
+            const rect = container.getBoundingClientRect();
+            if (e.clientX < rect.left || e.clientX > rect.right ||
+                e.clientY < rect.top || e.clientY > rect.bottom) {
+
+                if (placeholder && placeholder.parentNode) {
+                    placeholder.parentNode.removeChild(placeholder);
+                    placeholder = null;
+                }
+            }
+        }
+
+        // Ініціалізація
+        makeDraggable();
+
+        // Додаємо event listeners
+        container.addEventListener('dragstart', handleDragStart);
+        container.addEventListener('dragover', handleDragOver);
+        container.addEventListener('drop', handleDrop);
+        container.addEventListener('dragend', handleDragEnd);
+        container.addEventListener('dragenter', handleDragEnter);
+        container.addEventListener('dragleave', handleDragLeave);
+
+        // Функція для оновлення при додаванні нових елементів
+        function updateDraggable() {
+            makeDraggable();
+        }
+
+        // Повертаємо об'єкт з методами для керування
+        return {
+            updateDraggable: updateDraggable,
+            destroy: function() {
+                container.removeEventListener('dragstart', handleDragStart);
+                container.removeEventListener('dragover', handleDragOver);
+                container.removeEventListener('drop', handleDrop);
+                container.removeEventListener('dragend', handleDragEnd);
+                container.removeEventListener('dragenter', handleDragEnter);
+                container.removeEventListener('dragleave', handleDragLeave);
+
+                const items = container.querySelectorAll('.container-hl-preview-item');
+                items.forEach(item => {
+                    item.draggable = false;
+                    item.style.cursor = '';
+                });
+            }
+
+        };
+    }
+
+
+
+
+
+
+    function updateHLForRestApi(mainDiv, hlName) {
+        const dataStr = document.querySelector(`#hl_data_${hlName}`);
+        let data = [];
+
+        const dataPreviewAll = [...mainDiv.querySelector('.container-hl-preview').children];
+
+        dataPreviewAll.forEach(previewItem => {
+            let dataItem = {};
+            const contentBlock = previewItem.querySelector('.hl-preview-item-content');
+            if (!contentBlock) return;
+
+            const elementItems = [...contentBlock.children];
+
+            elementItems.forEach(elementItem => {
+
+                if (elementItem.classList.contains('hl_content_text')) {
+                    const typeEl = elementItem.children[0];
+                    const valueEl = elementItem.children[1];
+
+                    if (!typeEl || !valueEl) return;
+
+                    const key = typeEl.getAttribute('data-type');
+                    const value = valueEl.textContent;
+
+                    if (key) {
+                        dataItem[key] = value;
+                    }
+                }else if (elementItem.classList.contains('hl_content_img_link')) {
+                    const typeEl = elementItem.children[0];
+
+                    if (!typeEl) return;
+
+                    const key = typeEl.getAttribute('data-type');
+                    let value = []
+                    const allSrc = elementItem.querySelectorAll('img')
+                    allSrc.forEach(element=>{
+                        value.push(element.src)
+                    })
+                    if (key) {
+                        dataItem[key] = value;
+                    }
+                }else if (elementItem.classList.contains('hl_content_img_svg')) {
+                    const typeEl = elementItem.children[0];
+
+                    if (!typeEl) return;
+
+                    const key = typeEl.getAttribute('data-type');
+                    let value = elementItem.children[1].innerHTML
+                    if (key) {
+                        dataItem[key] = value;
+                    }
+                }
+                else if (elementItem.classList.contains('hl_content_video')) {
+                    const typeEl = elementItem.children[0];
+
+                    if (!typeEl) return;
+
+                    const key = typeEl.getAttribute('data-type');
+                    let value = []
+                    const allSrc = elementItem.querySelectorAll('video')
+                    allSrc.forEach(element=>{
+                        value.push(element.src)
+                    })
+                    if (key) {
+                        dataItem[key] = value;
+
+                    }
+                }
+
+            });
+            data.push(dataItem);
+        });
+
+        const dataJson = JSON.stringify(data);
+        if (dataStr) {
+            dataStr.setAttribute('value', dataJson)
+            dataStr.value = dataJson; // достатньо цього
+        }
+    }
+
+    function getHl(mainDiv, hlName) {
+        let allElements = trimArray([...mainDiv.querySelector('.container-hl-add').children]);
+        let dataValue = {}
+        allElements.forEach(element => {
+            if (element.id.startsWith('hl_input') || element.id.startsWith('hl_textarea')) {
+                if (element.id.startsWith('hl_input_checkbox')) {
+                    if (element.checked){
+                        dataValue[element.id] = 'on'
+                    }else {
+                        dataValue[element.id] = 'off'
+                    }
+                    element.checked = false
+                }else{
+                    dataValue[element.id] = element.value
+                    element.value = ''
+                }
+            }else if(element.id.startsWith('hl_img_link_')){
+                let dataImg = []
+                const allSrc = element.querySelectorAll('img')
+                allSrc.forEach(element=>{
+                    dataImg.push(element.src)
+                })
+                dataValue[element.id] = dataImg
+                element.querySelector('div').innerHTML = ''
+            }else if(element.id.startsWith('hl_img_svg_')){
+                dataValue[element.id] = element.querySelector('div').innerHTML
+                element.querySelector('div').innerHTML = ''
+                element.querySelector('textarea').value = ''
+            }else if(element.id.startsWith('hl_video_')){
+                let dataImg = []
+                const allSrc = element.querySelectorAll('video')
+                allSrc.forEach(element=>{
+                    dataImg.push(element.src)
+                })
+                dataValue[element.id] = dataImg
+                element.querySelector('div').innerHTML = ''
+            }
+
+
+        })
+        return dataValue;
+    }
+
+    function createElement(mainDiv, data, hlName) {
+        if (!Array.isArray(data)) {
+            data = [data];
+        }
+        console.log(data)
+        const previewDiv = mainDiv.querySelector('.container-hl-preview')
+        data.forEach(elementBlock => {
+            console.log(elementBlock)
+            const divItem = document.createElement('div')
+            divItem.classList.add('container-hl-preview-item')
+            const divItemContent = document.createElement('div')
+            divItemContent.classList.add('hl-preview-item-content')
+            for (const elementId in elementBlock) {
+                const elementValue = elementBlock[elementId]
+                const divContentItem = document.createElement('div')
+                if (elementId.startsWith('hl_input') || elementId.startsWith('hl_textarea')) {
+                    divContentItem.classList.add('hl_content_text')
+                    const spanName = document.createElement('span')
+                    if (elementId.startsWith('hl_textarea')){
+                        spanName.textContent = sliceAfterUnderscore(elementId, 2)
+                    }else{
+                        spanName.textContent = sliceAfterUnderscore(elementId, 3)
+                    }
+                    spanName.setAttribute('data-type', elementId)
+                    const pText = document.createElement('p')
+
+                    pText.textContent = elementValue
+
+                    divContentItem.appendChild(spanName)
+                    divContentItem.appendChild(pText)
+                    if (elementId.startsWith('hl_input_color')){
+                        const divColor = document.createElement('div')
+                        divColor.classList.add('hl_input_color_preview')
+                        divColor.style.backgroundColor = elementValue
+                        divContentItem.appendChild(divColor)
+                    }
+                }else if(elementId.startsWith('hl_img_link_')){
+
+                    divContentItem.classList.add('hl_content_img_link')
+                    const spanName = document.createElement('span')
+                    spanName.setAttribute('data-type', elementId)
+                    spanName.textContent = sliceAfterUnderscore(elementId, 3)
+                    const divImgContainer = document.createElement('div')
+                    divImgContainer.classList.add('hl_img_link_preview_container')
+                    divContentItem.appendChild(spanName)
+                    divContentItem.appendChild(divImgContainer)
+                    renderImagesInContainer(divImgContainer,elementValue)
+
+                }else if(elementId.startsWith('hl_img_svg_')){
+
+                    divContentItem.classList.add('hl_content_img_svg')
+                    const spanName = document.createElement('span')
+                    spanName.setAttribute('data-type', elementId)
+                    spanName.textContent = sliceAfterUnderscore(elementId, 3)
+                    const divImgContainer = document.createElement('div')
+                    divImgContainer.classList.add('hl_img_link_preview_container')
+                    divImgContainer.innerHTML = elementValue
+                    divContentItem.appendChild(spanName)
+                    divContentItem.appendChild(divImgContainer)
+                }else if(elementId.startsWith('hl_video')){
+                    divContentItem.classList.add('hl_content_video')
+                    const spanName = document.createElement('span')
+                    spanName.setAttribute('data-type', elementId)
+                    spanName.textContent = sliceAfterUnderscore(elementId, 2)
+                    const divVideoContainer = document.createElement('div')
+                    divVideoContainer.classList.add('hl_video_preview_container')
+                    divContentItem.appendChild(spanName)
+                    divContentItem.appendChild(divVideoContainer)
+                    renderVideosInContainer(divVideoContainer,elementValue)
+
+                }
+
+
+                divItemContent.appendChild(divContentItem)
+
+            }
+            const divItemAction = document.createElement('div')
+            divItemAction.classList.add('hl-preview-item-action')
+
+            const btnRemove = createInputBtn("hl_btn_remove", 'X', actionBtnRemove)
+            const btnEdit = createInputBtn("hl_btn_edit", 'i', actionEdit)
+            divItemAction.appendChild(btnRemove)
+            divItemAction.appendChild(btnEdit)
+
+            divItem.appendChild(divItemContent)
+            divItem.appendChild(divItemAction)
+            previewDiv.appendChild(divItem)
+        })
+
+        updateHLForRestApi(mainDiv, hlName)
+        const dragAndDrop = enableDragAndDrop(previewDiv, mainDiv, hlName);
+        dragAndDrop.updateDraggable();
+    }
+
+    hlNames.forEach(hlName => {
+        const btnAdd = document.querySelector(`#hl_btn_add_${hlName}`)
+        const mainDiv = document.querySelector(`#container-hl-${hlName}`)
+        const dataStr = document.querySelector(`#hl_data_${hlName}`);
+        const allBtnUploadPhoto = document.querySelectorAll('[id^="hl_img_link_upload_"]');
+        const allBtnUploadVideo = document.querySelectorAll('[id^="hl_video_upload_"]');
+        const allSvgInput = document.querySelectorAll('[id^="hl_img_svg_input_"]');
+        allBtnUploadPhoto.forEach( btnElement =>{
+            let btnName = sliceAfterUnderscore(btnElement.id,4)
+            let multiple = false
+            if (btnName.endsWith('_')){
+                multiple = true
+            }
+            const previewContainer = document.querySelector(`#hl_img_link_preview_container_${btnName}`)
+            openMediaUploader(btnElement,multiple, function (images){
+                renderImagesInContainer(previewContainer,images.map(img => img.url), )
+            })
+        })
+        allBtnUploadVideo.forEach(btnElement => {
+            let btnName = sliceAfterUnderscore(btnElement.id, 3);
+            let multiple = false;
+
+            if (btnName.endsWith('_')) {
+                multiple = true;
+            }
+            const previewContainer = document.querySelector(`#hl_video_preview_container_${btnName}`);
+
+            openVideoUploader(btnElement, multiple, function (videos) {
+                // Передаємо масив об'єктів відео, як є
+                renderVideosInContainer(previewContainer,videos.map(video => video.url));
+            });
+        });
+        const dragAndDrop = enableDragAndDrop(mainDiv.querySelector('.container-hl-preview'),mainDiv, hlName);
+
+        allSvgInput.forEach(textarea =>{
+            const previewSvg = textarea.parentElement.querySelector('div')
+            bindTextareaToSVGPreview(textarea,previewSvg)
+        })
+
+        let dataArray = [];
+        if (dataStr) {
+            try {
+                dataArray = JSON.parse(dataStr.value);
+            } catch (e) {
+                console.error('JSON parsing error:', e);
+                dataArray = [];
+            }
+        } else {
+            console.warn(`#hl_data_${hlName} not found`);
+        }
+
+        console.log(dataArray)
+        createElement(mainDiv, dataArray, hlName)
+        btnAdd.addEventListener('click', function () {
+            let data = getHl(mainDiv, hlName)
+
+            createElement(mainDiv, data, hlName)
+        })
+    })
+
+}
+/***/  HARD_LABEL_INC
+let hlNames = ['HL_DATA']
+    processHardLabel(hlNames)
+/***/  STYLE_HARD_LABEL
+/* Основні стилі для контейнера форми */
+.form-container-hl {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Основний контейнер */
+.container-hl {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Секція додавання елементів */
+.container-hl-add {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.container-hl-add h3 {
+    margin: 0 0 20px 0;
+    color: #343a40;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Стилі для лейблів */
+label {
+    display: block;
+    margin: 15px 0 5px 0;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+label:first-child {
+    margin-top: 0;
+}
+
+/* Стилі для інпутів */
+.input_text-item,
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="color"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.input_text-item:focus,
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="color"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    background: #fdfdff;
+}
+
+/* Стилі для чекбокса */
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    accent-color: #007bff;
+    cursor: pointer;
+}
+
+/* Стилі для textarea */
+textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    background: #fdfdff;
+}
+
+/* Стилі для прихованого інпута */
+input[type="text"][hidden] {
+    display: none;
+}
+
+/* Секції завантаження медіа */
+.hl_img_link,
+.hl_img_svg,
+.hl_video {
+    margin: 20px 0;
+    padding: 15px;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.hl_img_link:hover,
+.hl_img_svg:hover,
+.hl_video:hover {
+    border-color: #007bff;
+    background: rgba(0, 123, 255, 0.05);
+}
+
+/* Кнопки завантаження */
+input[type="button"] {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+input[type="button"]:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+input[type="button"]:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+/* Спеціальна кнопка Add */
+#hl_btn_add_LLABEL {
+    width: 100%;
+    margin-top: 25px;
+    padding: 15px;
+    font-size: 16px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
+}
+
+#hl_btn_add_LLABEL:hover {
+    background: linear-gradient(135deg, #20c997, #17a2b8);
+    box-shadow: 0 5px 10px rgba(40, 167, 69, 0.4);
+}
+
+/* Контейнери превью */
+.hl_img_link_preview_container,
+.hl_video_preview_container {
+    margin-top: 10px;
+    min-height: 40px;
+    padding: 10px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background: white;
+}
+
+.hl_img_svg_preview {
+    margin-top: 10px;
+    min-height: 100px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Секція превью елементів */
+.container-hl-preview {
+    min-height: 100px;
+    padding: 20px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+    background: #fafbfc;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    align-items: start;
+}
+
+.container-hl-preview:empty::before {
+    content: "Елементи з'являться тут після додавання";
+    display: block;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 40px 20px;
+    font-size: 16px;
+    grid-column: 1 / -1;
+}
+
+/* Стилі для елементів які можна перетягувати */
+.container-hl-preview-item {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 0;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    user-select: none;
+}
+
+.container-hl-preview-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    border-color: #007bff;
+}
+
+.container-hl-preview-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Стилі під час перетягування */
+.container-hl-preview-item.dragging {
+    opacity: 0.6;
+    transform: rotate(3deg) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    z-index: 1000;
+    border-color: #007bff;
+}
+
+.container-hl-preview-item[draggable="true"] {
+    cursor: move;
+}
+
+.container-hl-preview-item[draggable="true"]:hover::before {
+    content: "⋮⋮";
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #007bff;
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: -2px;
+    font-weight: bold;
+}
+
+/* Placeholder стилі */
+.drag-placeholder {
+    height: 4px !important;
+    background: linear-gradient(90deg, #007bff, #00d4ff);
+    margin: 10px 0 !important;
+    border-radius: 2px;
+    opacity: 0.8;
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.6);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.8;
+        transform: scaleY(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scaleY(2);
+    }
+}
+
+/* Стилі для зони перетягування */
+.container-hl-preview.drag-over {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Контент елементів превью */
+.hl-preview-item-content {
+    display: grid;
+    gap: 12px;
+}
+
+.hl_content_text {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.hl_content_text:last-of-type {
+    border-bottom: none;
+}
+
+.hl_content_text span[data-type] {
+    font-weight: 600;
+    color: #495057;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #e9ecef;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.hl_content_text p {
+    margin: 0;
+    color: #212529;
+    word-break: break-word;
+    font-size: 14px;
+}
+
+/* Спеціальні стилі для різних типів контенту */
+.hl_content_text span[data-type*="answer"] {
+    background: #d4edda;
+    color: #155724;
+}
+
+.hl_content_text span[data-type*="date"] {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.hl_content_text span[data-type*="time"] {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.hl_content_text span[data-type*="color"] {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.hl_content_text span[data-type*="checkbox"] {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+/* Стилі для кольорового превью */
+.hl_input_color_preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #dee2e6;
+    display: inline-block;
+}
+
+/* Стилі для медіа контенту */
+.hl_content_img_link,
+.hl_content_img_svg,
+.hl_content_video {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.hl_content_img_link span,
+.hl_content_img_svg span,
+.hl_content_video span {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #495057 !important;
+    font-size: 12px !important;
+    text-transform: uppercase;
+    background: #007bff !important;
+    color: white !important;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.image-wrapper,
+.video-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.image-item {
+    max-width: 120px;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.image-item:hover {
+    border-color: #007bff;
+    transform: scale(1.05);
+}
+
+.video-item {
+    max-width: 250px;
+    border-radius: 6px;
+    border: 2px solid #e9ecef;
+}
+
+/* Стилі для SVG */
+.hl_img_link_preview_container svg {
+    max-width: 120px;
+    max-height: 120px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    background: white;
+    padding: 5px;
+}
+
+/* Стилі для кнопок дій */
+.hl-preview-item-action {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+    justify-content: flex-end;
+}
+
+.hl_btn_remove,
+.hl_btn_edit {
+    padding: 8px 16px;
+    border: 1px solid #dee2e6;
+    background: #f8f9fa;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hl_btn_remove:hover {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.hl_btn_edit:hover {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Анімації */
+.container-hl-preview-item {
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивність */
+@media (max-width: 968px) {
+    .container-hl-preview {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-container-hl {
+        padding: 15px;
+    }
+
+    .container-hl {
+        padding: 15px;
+    }
+
+    .container-hl-add,
+    .container-hl-preview {
+        padding: 15px;
+    }
+
+    .container-hl-preview-item {
+        padding: 15px;
+    }
+
+    .hl_content_text {
+        grid-template-columns: 80px 1fr;
+        gap: 8px;
+    }
+
+    .hl_content_text span[data-type] {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    .image-wrapper,
+    .video-wrapper {
+        flex-direction: column;
+    }
+
+    .image-item,
+    .video-item {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .hl_content_text {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .hl_content_text span[data-type] {
+        justify-self: start;
+    }
+}
+
+/* Стилі для доступності */
+.container-hl-preview-item:focus {
+    outline: 3px solid #007bff;
+    outline-offset: 2px;
+}
+
+button:focus,
+input:focus,
+textarea:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* Стилі для темної теми */
+@media (prefers-color-scheme: dark) {
+    .form-container-hl {
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+    .container-hl,
+    .container-hl-add,
+    .container-hl-preview-item {
+        background: #2d2d2d;
+        border-color: #555;
+        color: #fff;
+    }
+
+    .container-hl-preview {
+        background: #262626;
+        border-color: #555;
+    }
+
+    .input_text-item,
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    textarea {
+        background: #333;
+        border-color: #555;
+        color: #fff;
+    }
+
+    .hl_content_text {
+        border-bottom-color: #555;
+    }
+
+    label {
+        color: #ccc;
+    }
+
+    .drag-placeholder {
+        background: linear-gradient(90deg, #4a90e2, #5ba7f7);
+    }
+}
+
+/* Стилі для високої контрастності */
+@media (prefers-contrast: high) {
+    .container-hl-preview-item {
+        border: 2px solid #000;
+    }
+
+    .input_text-item,
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    textarea {
+        border: 2px solid #000;
+    }
+
+    input[type="button"] {
+        border: 2px solid #000;
+    }
+}
+
+/* Стилі для зменшення анімацій */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+/***/  END

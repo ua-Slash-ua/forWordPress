@@ -270,6 +270,61 @@ class PostRecord(BaseRecord):
             self.error_log(e)
             return ''
 
+    def __create_hard_label(self,label,label_data):
+        try:
+            data = []
+            data_js_inc = []
+            data_hl_label = []
+            path_to_hl_post = self.handler_path.find_file('hard_label_post', self.template_wp_dir)
+            hl_data = self._get_data_template(path_to_hl_post, 'DATA_HARD_LABEL')
+            hl_input_data = self._get_data_template(path_to_hl_post, 'DATA_INPUT_HARD_LABEL')
+            hl_textarea_data = self._get_data_template(path_to_hl_post, 'DATA_TEXTAREA_HARD_LABEL')
+            hl_img_link_data = self._get_data_template(path_to_hl_post, 'DATA_IMG_LINK_HARD_LABEL')
+            hl_img_svg_data = self._get_data_template(path_to_hl_post, 'DATA_IMG_SVG_HARD_LABEL')
+            hl_video_data = self._get_data_template(path_to_hl_post, 'DATA_VIDEO_HARD_LABEL')
+            hl_get_data = self._get_data_template(path_to_hl_post, 'GET_HARD_LABEL')
+            hl_proc_data = self._get_data_template(path_to_hl_post, 'PROCESS_HARD_LABEL')
+            hl_cls_data = self._get_data_template(path_to_hl_post, 'CONCLASS_HARD_LABEL')
+            hl_func_data = self._get_data_template(path_to_hl_post, 'HARD_LABEL_FUNCTIONS')
+            hl_inc_data = self._get_data_template(path_to_hl_post, 'HARD_LABEL_INC')
+            hl_style = self._get_data_template(path_to_hl_post, 'STYLE_HARD_LABEL')
+            self.data_css.add(hl_style)
+            self.data_js_functions.add(hl_func_data)
+            data.append(f'          <div class="{self._replace_label(hl_cls_data, label)}">')
+            for hl_name in label_data:
+                data_js_inc.append(hl_name)
+                for label_type in label_data[hl_name]:
+                    if label_type.startswith('input'):
+                        for label_name in  label_data[hl_name][label_type]:
+                            data_hl_label.append(self._replace_label(hl_input_data,label_type,label_name))
+                    elif label_type.startswith('textarea'):
+                        for label_name in  label_data[hl_name][label_type]:
+                            data_hl_label.append(self._replace_label(hl_textarea_data,label_type,label_name))
+                    elif label_type.startswith('img_svg'):
+                        for label_name in  label_data[hl_name][label_type]:
+                            data_hl_label.append(self._replace_label(hl_img_svg_data,label_type,label_name))
+                    elif label_type.startswith('img_link'):
+                        for label_name in  label_data[hl_name][label_type]:
+                            data_hl_label.append(self._replace_label(hl_img_link_data,label_type,label_name))
+                    elif label_type.startswith('video'):
+                        for label_name in  label_data[hl_name][label_type]:
+                            data_hl_label.append(self._replace_label(hl_video_data,label_type,label_name))
+
+                self.data_php_get.append(self._replace_label(hl_get_data, label, hl_name))
+                self.data_php_proc.append(self._replace_label(hl_proc_data, label, hl_name))
+                adr = {
+                    'DATA_HL_LABEL': '\n'.join(data_hl_label)
+                }
+                data.append(self._replace_label(hl_data, label, hl_name, adr))
+            data.append('\n           </div>')
+            self.data_js_include.append(hl_inc_data.replace('HL_DATA', ',\n'.join(data_js_inc)))
+
+            data = '\n'.join(data)
+            return data
+        except Exception as e:
+            self.error_log(e)
+            return ''
+
     def _get_labels_render(self, labels):
 
         try:
@@ -291,6 +346,8 @@ class PostRecord(BaseRecord):
                     data.append(self.__create_table(k, labels[k]))
                 elif str(k).startswith('textarea'):
                     data.append(self.__create_textarea(k, labels[k]))
+                elif str(k).startswith('hard_label'):
+                    data.append(self.__create_hard_label(k, labels[k]))
 
             data = '\n'.join(data)
             return data
